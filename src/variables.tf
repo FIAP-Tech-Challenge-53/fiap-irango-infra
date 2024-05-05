@@ -1,4 +1,8 @@
 # Naming
+variable "environment" {
+  default = "studying"
+}
+
 variable "resource_prefix" {
   default = "fiap-irango"
 }
@@ -16,6 +20,10 @@ variable "default_az" {
 }
 
 # Outputs for variables
+output "environment" {
+  value = var.environment
+}
+
 output "resource_prefix" {
   value = var.resource_prefix
 }
