@@ -1,11 +1,6 @@
-name: Terraform Apply
+name: Terraform Destroy
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - terraform/**
   workflow_dispatch:
 
 env:
@@ -14,8 +9,8 @@ env:
   AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
 
 jobs:
-  apply:
-    name: Terraform Apply
+  destroy:
+    name: Terraform Destroy
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,5 +37,5 @@ jobs:
         id: validate
         run: terraform validate
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -input=false
