@@ -2,6 +2,9 @@
 ![terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
 ![aws](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 
+## Architecture Diagram:
+![Architecture diagram](./docs/fiap-irango-infra.png)
+
 ## Dependencies
 - [Terraform](https://developer.hashicorp.com/terraform/install?product_intent=terraform)
 - Make
