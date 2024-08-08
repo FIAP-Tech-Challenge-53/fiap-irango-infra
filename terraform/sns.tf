@@ -6,6 +6,14 @@ resource "aws_sns_topic" "order_order_created" {
   }
 }
 
+resource "aws_sns_topic" "payment_payment_created" {
+  name = "${var.resource_prefix}-payment_payment-created"
+
+  tags = {
+    Name = "${var.resource_prefix}-payment_payment-created-topic"
+  }
+}
+
 resource "aws_sns_topic" "payment_payment_confirmed" {
   name = "${var.resource_prefix}-payment_payment-confirmed"
 
