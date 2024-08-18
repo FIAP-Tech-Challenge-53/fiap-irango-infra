@@ -41,6 +41,48 @@ resource "aws_sns_topic_subscription" "payment_order_created_subscription" {
 }
 
 # =====================================================
+# =============== cook_order-created ===============
+# =====================================================
+resource "aws_sqs_queue" "cook_order_created_dlq" {
+  name                      = "${var.resource_prefix}-cook_order-created_dlq"
+  delay_seconds             = 0
+  max_message_size          = 262144
+  message_retention_seconds = 1209600
+  receive_wait_time_seconds = 0
+  visibility_timeout_seconds = 30
+
+  tags = {
+    Name = "${var.resource_prefix}-cook_order-created-dlq"
+  }
+}
+
+resource "aws_sqs_queue" "cook_order_created" {
+  name                      = "${var.resource_prefix}-cook_order-created"
+  delay_seconds             = 0
+  max_message_size          = 262144
+  message_retention_seconds = 1209600
+  receive_wait_time_seconds = 0
+  visibility_timeout_seconds = 30
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cook_order_created_dlq.arn
+    maxReceiveCount     = 4
+  })
+
+  # policy = "${data.aws_iam_policy_document.sqs-topic-policy-hlg.json}" # TODO - Verificar se é necessário
+
+  tags = {
+    Name = "${var.resource_prefix}-cook_order-created-queue"
+  }
+}
+
+resource "aws_sns_topic_subscription" "cook_order_created_subscription" {
+  topic_arn = aws_sns_topic.order_order_created.arn
+  protocol  = "sqs"
+  endpoint  = "${aws_sqs_queue.cook_order_created.arn}"
+}
+
+# =====================================================
 # ============== order_payment-created ==============
 # =====================================================
 resource "aws_sqs_queue" "payment_created_dlq" {
