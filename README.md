@@ -20,10 +20,35 @@ Before all, you need set AWS credentials ENVs using:
 ```bash
 export AWS_ACCESS_KEY_ID=xxxxxx
 export AWS_SECRET_ACCESS_KEY=xxxxxx
+export AWS_REGION=us-east-1
 ```
 Or configure it in windows environments.
 
-### Using make
+
+### Create a S3 bucket to store terraform state
+```bash
+aws s3api create-bucket --bucket fiap-irango-tfstate --region us-east-1
+```
+
+
+### Create secrets in AWS Secrets Manager
+```bash
+cp secrets.json.example secrets.json
+# Edit secrets.json with your secrets
+
+aws secretsmanager create-secret --name fiap-irango-secrets-api --secret-string file://env.json
+```
+
+
+### To delete secrets
+```bash
+aws secretsmanager delete-secret --secret-id fiap-irango-secrets-api --force-delete-without-recovery
+```
+
+
+### Running terraform
+
+#### Using make
 ```bash
 # To init terraform
 make init
@@ -40,8 +65,7 @@ To destroy resources:
 make down
 ```
 
-
-### Without make
+#### Without make
 ```bash
 # To init terraform
 terraform -chdir=terraform init
