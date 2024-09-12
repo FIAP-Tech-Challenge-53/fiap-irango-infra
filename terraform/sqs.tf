@@ -40,6 +40,33 @@ resource "aws_sns_topic_subscription" "payment_order_created_subscription" {
   endpoint  = aws_sqs_queue.payment_order_created.arn
 }
 
+data "aws_iam_policy_document" "payment_order_created_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.payment_order_created.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.order_order_created.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "payment_order_created_queue_policy" {
+  queue_url = aws_sqs_queue.payment_order_created.id
+  policy    = data.aws_iam_policy_document.payment_order_created_policy.json
+}
+
+
 # =====================================================
 # =============== cook_order-created ===============
 # =====================================================
@@ -82,10 +109,36 @@ resource "aws_sns_topic_subscription" "cook_order_created_subscription" {
   endpoint  = aws_sqs_queue.cook_order_created.arn
 }
 
+data "aws_iam_policy_document" "cook_order_created_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.cook_order_created.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.order_order_created.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "cook_order_created_queue_policy" {
+  queue_url = aws_sqs_queue.cook_order_created.id
+  policy    = data.aws_iam_policy_document.cook_order_created_policy.json
+}
+
 # =====================================================
 # ============== order_payment-created ==============
 # =====================================================
-resource "aws_sqs_queue" "payment_created_dlq" {
+resource "aws_sqs_queue" "order_payment_created_dlq" {
   name                       = "${var.resource_prefix}-order_payment-created_dlq"
   delay_seconds              = 0
   max_message_size           = 262144
@@ -107,7 +160,7 @@ resource "aws_sqs_queue" "order_payment_created" {
   visibility_timeout_seconds = 30
 
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.payment_created_dlq.arn
+    deadLetterTargetArn = aws_sqs_queue.order_payment_created_dlq.arn
     maxReceiveCount     = 4
   })
 
@@ -122,6 +175,32 @@ resource "aws_sns_topic_subscription" "order_payment_created_subscription" {
   topic_arn = aws_sns_topic.payment_payment_created.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.order_payment_created.arn
+}
+
+data "aws_iam_policy_document" "order_payment_created_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.order_payment_created.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.payment_payment_created.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "order_payment_created_queue_policy" {
+  queue_url = aws_sqs_queue.order_payment_created.id
+  policy    = data.aws_iam_policy_document.order_payment_created_policy.json
 }
 
 # =====================================================
@@ -202,6 +281,32 @@ resource "aws_sns_topic_subscription" "order_payment_confirmed_subscription" {
   endpoint  = aws_sqs_queue.order_payment_confirmed.arn
 }
 
+data "aws_iam_policy_document" "order_payment_confirmed_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.order_payment_confirmed.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.payment_payment_confirmed.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "order_payment_confirmed_queue_policy" {
+  queue_url = aws_sqs_queue.order_payment_confirmed.id
+  policy    = data.aws_iam_policy_document.order_payment_confirmed_policy.json
+}
+
 # =====================================================
 # =============== cook_payment-confirmed ==============
 # =====================================================
@@ -242,6 +347,32 @@ resource "aws_sns_topic_subscription" "cook_payment_confirmed_subscription" {
   topic_arn = aws_sns_topic.payment_payment_confirmed.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.cook_payment_confirmed.arn
+}
+
+data "aws_iam_policy_document" "cook_payment_confirmed_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.cook_payment_confirmed.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.payment_payment_confirmed.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "cook_payment_confirmed_queue_policy" {
+  queue_url = aws_sqs_queue.cook_payment_confirmed.id
+  policy    = data.aws_iam_policy_document.cook_payment_confirmed_policy.json
 }
 
 # =====================================================
@@ -286,6 +417,32 @@ resource "aws_sns_topic_subscription" "order_cooking_started_subscription" {
   endpoint  = aws_sqs_queue.order_cooking_started.arn
 }
 
+data "aws_iam_policy_document" "order_cooking_started_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.order_cooking_started.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.cook_cooking_started.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "order_cooking_started_queue_policy" {
+  queue_url = aws_sqs_queue.order_cooking_started.id
+  policy    = data.aws_iam_policy_document.order_cooking_started_policy.json
+}
+
 # =====================================================
 # =============== order_cooking-finished ==============
 # =====================================================
@@ -326,4 +483,30 @@ resource "aws_sns_topic_subscription" "order_cooking_finished_subscription" {
   topic_arn = aws_sns_topic.cook_cooking_finished.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.order_cooking_finished.arn
+}
+
+data "aws_iam_policy_document" "order_cooking_finished_policy" {
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.order_cooking_finished.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.cook_cooking_finished.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "order_cooking_finished_queue_policy" {
+  queue_url = aws_sqs_queue.order_cooking_finished.id
+  policy    = data.aws_iam_policy_document.order_cooking_finished_policy.json
 }
